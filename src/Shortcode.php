@@ -17,7 +17,7 @@ class Shortcode
     public function setDelimiters($open, $close=null)
     {
         $this->opening = $open;
-        $this->closing = is_null($close) ? $open : $close;
+        $this->closing = $close ?: $open;
     }
 
     public function process()
@@ -98,16 +98,19 @@ class Shortcode
         $offsetCorrection = 0;
         foreach($codes as $code) {
             $sc = $code['_code'];
-            array_unshift($args, $code);
+            $code['_offset'] += $offsetCorrection;
             $func = $this->getCodeCallable($sc);
             if ($func === null) {
                 continue;
             }
 
-            $replacement = call_user_func_array($func, $args);
+            $newargs = [$code];
+            foreach ($args as $arg) {
+                $newargs []= $arg;
+            }
+            $replacement = call_user_func_array($func, $newargs);
             if ($replacement !== null) {
-                $offset = $code['_offset']+$offsetCorrection;
-                $text = mb_substr($text, 0, $offset).$replacement.mb_substr($text, $offset+$code['_length']);
+                $text = mb_substr($text, 0, $code['_offset']).$replacement.mb_substr($text, $code['_offset']+$code['_length']);
                 $offsetCorrection += mb_strlen($replacement) - mb_strlen($code['_raw']);
             }
         }
