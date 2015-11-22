@@ -60,8 +60,8 @@ class Shortcode
     {
         $opening = preg_quote($this->opening, '~');
         $closing = preg_quote($this->closing, '~');
-        $shortcodeRegex = "~$opening([\w-]*)?((?:\s(?:[\w-]*)(?:=(?:\".*?\"|\S+))?)*)$closing(?:(.*?)$opening\/\\1$closing)?~";
-        $optionsRegex = "~(?:\s([\w-]*)(?:=(?:\"(.*?)\"|(\S+)))?)~";
+        $shortcodeRegex = "~$opening([\\w-]*)?((?:\\s(?:[\\w-]*)(?:=(?:\".*?\"|\\S+))?)*)$closing(?:(.*?)$opening\\/\\1$closing)?~";
+        $optionsRegex = '~\s([\w-]*)(?:=(?:"(.*?)"|(\S+)))?~';
 
         if (!preg_match_all($shortcodeRegex, $text, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE)) {
             return [];

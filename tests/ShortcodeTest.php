@@ -68,4 +68,17 @@ class ShortcodeTests extends \PHPUnit_Framework_TestCase
         $sc = $this->getShortcodeProcessor();
         $this->assertEquals($expected, $sc->process($text));
     }
+
+    public function testCustomSyntax()
+    {
+        $sc = new Shortcode('{{', '}}');
+        $sc->register('name', function($options) {
+            return $options['_code'];
+        });
+        $sc->register('content', function($options) {
+            return $options['_content'];
+        });
+        $this->assertEquals('name', $sc->process('{{name}}'));
+        $this->assertEquals('zyx', $sc->process('{{content}}zyx{{/content}}'));
+    }
 }
