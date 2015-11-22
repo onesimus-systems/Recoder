@@ -15,6 +15,15 @@ class ShortcodeTests extends \PHPUnit_Framework_TestCase
         $sc->register('reverse', function($options) {
             return strrev($options['_content']);
         });
+        $sc->register('options', function($options) {
+            $r = [];
+            foreach($options as $option => $value) {
+                if ($option[0] !== '_') {
+                    $r []= "$option:$value";
+                }
+            }
+            return implode('&', $r);
+        });
         $sc->register('url', function($options) {
             if ($options['_content'] !== '') {
                 return '<a href="'.$options['_content'].'">'.$options['_content'].'</a>';
@@ -47,6 +56,7 @@ class ShortcodeTests extends \PHPUnit_Framework_TestCase
             ['x [url url="http://giggle.com/search"] z', 'x <a href="http://giggle.com/search">http://giggle.com/search</a> z'],
             ['x [url="http://giggle.com/search"] z', 'x [url="http://giggle.com/search"] z'],
             ['x [url]http://giggle.com/search[/url] z', 'x <a href="http://giggle.com/search">http://giggle.com/search</a> z'],
+            ['[options arg1=val1 arg2="val with space" arg3]', 'arg1:val1&arg2:val with space&arg3:1'],
         ];
     }
 
