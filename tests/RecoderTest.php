@@ -1,11 +1,11 @@
 <?php
-namespace Shortcode;
+namespace Recoder;
 
-class ShortcodeTests extends \PHPUnit_Framework_TestCase
+class RecoderTests extends \PHPUnit_Framework_TestCase
 {
     public static function getShortcodeProcessor()
     {
-        $sc = new Shortcode();
+        $sc = new Recoder();
         $sc->register('name', function($options) {
             return $options['_code'];
         });
@@ -63,7 +63,7 @@ class ShortcodeTests extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider caseProvider
      */
-    public function testContent($text, $expected)
+    public function testShortcodes($text, $expected)
     {
         $sc = $this->getShortcodeProcessor();
         $this->assertEquals($expected, $sc->process($text));
@@ -71,7 +71,7 @@ class ShortcodeTests extends \PHPUnit_Framework_TestCase
 
     public function testCustomSyntax()
     {
-        $sc = new Shortcode('{{', '}}');
+        $sc = new Recoder('{{', '}}');
         $sc->register('name', function($options) {
             return $options['_code'];
         });
@@ -80,5 +80,13 @@ class ShortcodeTests extends \PHPUnit_Framework_TestCase
         });
         $this->assertEquals('name', $sc->process('{{name}}'));
         $this->assertEquals('zyx', $sc->process('{{content}}zyx{{/content}}'));
+    }
+
+    public function testInvalidCode()
+    {
+        $sc = new Recoder();
+        $this->assertTrue($sc->register('valid', function() { return ''; }));
+        $this->assertFalse($sc->register('_invalid', function() { return ''; }));
+        $this->assertFalse($sc->registerAlias('_alias', 'name'));
     }
 }

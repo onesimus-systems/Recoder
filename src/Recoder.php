@@ -1,7 +1,7 @@
 <?php
-namespace Shortcode;
+namespace Recoder;
 
-class Shortcode
+class Recoder
 {
     private $opening = '[';
     private $closing = ']';
@@ -36,12 +36,20 @@ class Shortcode
 
     public function register($code, callable $func)
     {
+        if (!preg_match('~^(?!_)[\\w-]*~', $code)) {
+            return false;
+        }
         $this->codes[$code] = $func;
+        return true;
     }
 
     public function registerAlias($alias, $code)
     {
+        if (!preg_match('~^(?!_)[\\w-]*~', $alias)) {
+            return false;
+        }
         $this->codes[$alias] = "_$code";
+        return true;
     }
 
     public function unregister($code = null)
@@ -60,7 +68,7 @@ class Shortcode
     {
         $opening = preg_quote($this->opening, '~');
         $closing = preg_quote($this->closing, '~');
-        $shortcodeRegex = "~$opening([\\w-]*)?((?:\\s(?:[\\w-]*)(?:=(?:\".*?\"|\\S+))?)*)$closing(?:(.*?)$opening\\/\\1$closing)?~";
+        $shortcodeRegex = "~$opening((?!_)[\\w-]*)?((?:\\s(?:[\\w-]*)(?:=(?:\".*?\"|\\S+))?)*)$closing(?:(.*?)$opening\\/\\1$closing)?~";
         $optionsRegex = '~\s([\w-]*)(?:=(?:"(.*?)"|(\S+)))?~';
 
         if (!preg_match_all($shortcodeRegex, $text, $matches, PREG_SET_ORDER | PREG_OFFSET_CAPTURE)) {
